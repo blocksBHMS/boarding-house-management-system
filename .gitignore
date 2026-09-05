@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Test / coverage / lint
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.pytype/
+.ruff_cache/
+.pylint.d/
+
+# SQLite databases
+*.sqlite3
+db.sqlite3
+
+# Static & media files
+/staticfiles/
+/media/
+
+# Local settings & environment secrets
+.env
+.env.*
+local_settings.py
+*.pem
+*.key
+
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+
+.DS_Store
+Thumbs.db
+
+
+*.log
