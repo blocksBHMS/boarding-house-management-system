@@ -49,11 +49,32 @@ class AccountLogin(APIView):
 
 		)
 
-class AccountRegister(APIView):
+# account register for landlord
+class AccountRegisterLandlord(APIView):
 	permission_classes = [AllowAny]
 
 	def post(self, request):
-		serializer = AccountSerializer(data = request.data)
+		data = request.data.copy()
+		data['role'] = 'landlord'
+		serializer = AccountSerializer(data = data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(
+				data = serializer.data, status=HTTP_201_CREATED
+			)
+
+		return Response(
+			data = serializer.errors, status = status.HTTP_400_BAD_REQUEST
+		)
+
+#account register for tenant
+class AccountRegisterTenant(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+		data = request.data.copy()
+		data['role'] = 'tenant'
+		serializer = AccountSerializer(data = data)
 		if serializer.is_valid():
 			serializer.save()
 			return Response(
