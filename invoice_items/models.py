@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 class Invoiceitem(models.Model):
     id = models.AutoField(primary_key=True)
+    
     CHARGE_CHOICES = [
         ("rent", "Rent"),
         ("electricity", "Electricity"),

@@ -8,6 +8,7 @@ class Bed(models.Model):
                                 on_delete=models.CASCADE, 
                                 related_name="beds"
                                 )
+    
     bed_label = models.CharField(max_length=50)
 
     def __str__(self):

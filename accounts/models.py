@@ -25,5 +25,13 @@ class Accounts(AbstractUser):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def full_name(self):
+        parts = [
+            part for part in (self.first_name, self.middle_name, self.last_name)
+            if part
+        ]
+        return " ".join(parts) if parts else self.username
+
     def __str__(self):
         return self.username
