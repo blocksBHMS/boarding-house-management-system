@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib import AbstractUser
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
@@ -11,7 +11,9 @@ class Accounts(AbstractUser):
     ]
 
     username = models.CharField(max_length=50, unique=True)
-    full_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=30)
+    middle_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30)  
     contact_number = models.CharField(max_length=15)
     password = models.CharField(max_length=128)
 
