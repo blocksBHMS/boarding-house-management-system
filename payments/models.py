@@ -11,7 +11,11 @@ class Payment(models.Model):
         ("other", "Other"),
     ]
 
-    invoice = models.ForeignKey("invoices.Invoice", on_delete=models.CASCADE, related_name="payments")
+    invoice = models.ForeignKey("invoices.Invoice", 
+                                on_delete=models.CASCADE, 
+                                related_name="payments"
+                                )
+    
     payment_date = models.DateField()
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     method = models.CharField(max_length=20, choices=METHOD_CHOICES)

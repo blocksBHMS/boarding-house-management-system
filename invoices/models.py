@@ -4,7 +4,10 @@ from django.db import models
 
 class Invoice(models.Model):
     id = models.AutoField(primary_key=True)
-    tenancy_id = models.ForeignKey("tenancies.Tenancy", on_delete=models.PROTECT, related_name="invoices")
+    tenancy_id = models.ForeignKey("tenancies.Tenancy", 
+                                   on_delete=models.PROTECT, 
+                                   related_name="invoices"
+                                   )
     billing_month = models.DateField()
 
     def __str__(self):

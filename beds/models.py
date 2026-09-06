@@ -4,7 +4,10 @@ from django.db import models
 
 class Bed(models.Model):
     id = models.AutoField(primary_key=True)
-    room_id = models.ForeignKey("rooms.Room", on_delete=models.CASCADE, related_name="beds")
+    room_id = models.ForeignKey("rooms.Room", 
+                                on_delete=models.CASCADE, 
+                                related_name="beds"
+                                )
     bed_label = models.CharField(max_length=50)
 
     def __str__(self):
