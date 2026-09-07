@@ -12,6 +12,11 @@ class Tenancy(models.Model):
         related_name="tenancies",
     )
     
+    room = models.ForeignKey("rooms.Room", 
+                            on_delete=models.CASCADE, 
+                            related_name="tenancies"
+                            )
+
     bed = models.ForeignKey("beds.Bed", 
                             on_delete=models.CASCADE, 
                             related_name="tenancies"
