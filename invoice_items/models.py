@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-class Invoiceitem(models.Model):
+class InvoiceItem(models.Model):
     id = models.AutoField(primary_key=True)
     
     CHARGE_CHOICES = [

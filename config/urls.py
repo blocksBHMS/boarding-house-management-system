@@ -19,4 +19,5 @@ from django.urls import path, include
 urlpatterns = [
 	path('api/', include('accounts.urls')),
     path('api/', include('beds.urls')),
+    path('api/', include('invoice_items.urls')),
 ]
