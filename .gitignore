@@ -30,6 +30,9 @@ htmlcov/
 *.sqlite3
 db.sqlite3
 
+# Django migrations (initial migration files)
+*/migrations/*_initial.py
+
 # Static & media files
 /staticfiles/
 /media/
