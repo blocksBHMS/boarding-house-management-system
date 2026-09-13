@@ -13,4 +13,4 @@ class Invoice(models.Model):
     billing_month = models.DateField()
 
     def __str__(self):
-        return f"Invoice {self.id} for Tenancy {self.billing_month} - Tenant: {self.tenancy_id.tenant_id.full_name}"
+        return f"Invoice {self.id} for Tenancy {self.billing_month} - Tenant: {self.tenancy_id.tenant.full_name}"
