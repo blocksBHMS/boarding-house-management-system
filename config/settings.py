@@ -87,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'boarding_house_db',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'PASSWORD': '5505',
         'HOST': 'localhost',
         'PORT': '5432',
     }
