@@ -1,59 +1,39 @@
-plan.txt
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-*.egg
-dist/
-build/
-.eggs/
-
-# Virtual environments
-.venv/
-venv/
-env/
-ENV/
-
-# Test / coverage / lint
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.mypy_cache/
-.pytype/
-.ruff_cache/
-.pylint.d/
-
-# SQLite databases
-*.sqlite3
-db.sqlite3
-
-# Django migrations (initial migration files)
-*/migrations/*_initial.py
-
-# Static & media files
-/staticfiles/
-/media/
-
-# Local settings & environment secrets
-.env
-.env.*
-local_settings.py
-*.pem
-*.key
-
-
-.vscode/
-.idea/
-*.swp
-*.swo
-*.sublime-workspace
-
-
-.DS_Store
-Thumbs.db
-
-
+# Logs
+logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo
+
+.eslintcache
+
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
+
+# Vitest
+__screenshots__/
+
+# Vite
+*.timestamp-*-*.mjs
