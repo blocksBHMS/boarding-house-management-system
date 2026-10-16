@@ -1,0 +1,97 @@
+name: Build, Push & Deploy
+
+on:
+  push:
+    branches: [deployment]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ------------------------------------------------------------------
+  # Job 1: Build both Dockerfiles with docker compose and push the two
+  # images (bhns-client, bhns-server) to Docker Hub.
+  # ------------------------------------------------------------------
+  build-and-push:
+    name: Build & push images to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build both images with docker compose
+        run: docker compose build
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_TAG: ${{ github.sha }}
+
+      - name: Push both images to Docker Hub
+        run: docker compose push
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_TAG: ${{ github.sha }}
+
+  # ------------------------------------------------------------------
+  # Job 2: SSH into the server, copy the compose file over, pull the
+  # two images from Docker Hub, and run the containers.
+  # ------------------------------------------------------------------
+  deploy:
+    name: Deploy on server
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: docker-compose.yml
+          target: ~/bhms
+
+      - name: Pull images & run containers on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ~/bhms || exit 1
+
+            export DOCKERHUB_USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
+            export IMAGE_TAG="${{ github.sha }}"
+
+            # Support both docker compose v2 and legacy docker-compose v1
+            if docker compose version >/dev/null 2>&1; then
+              DC="docker compose"
+            else
+              DC="docker-compose"
+            fi
+
+            echo "Pulling images..."
+            $DC pull
+
+            echo "Starting containers..."
+            $DC up -d --remove-orphans
+
+            echo "Deploy finished. Container status:"
+            $DC ps
