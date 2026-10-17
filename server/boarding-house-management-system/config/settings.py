@@ -156,7 +156,10 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days = 7),
     'AUTH_HEADER_TYPES': ('Bearer',)
 }
+<<<<<<< HEAD
 LANDLORD_PASSCODE = os.environ.get('LANDLORD_PASSCODE', '123456789')
+=======
+>>>>>>> 2b8615d (feat(server): remove register on homepage backend)
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
