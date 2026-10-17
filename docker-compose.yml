@@ -24,12 +24,12 @@ services:
     restart: unless-stopped
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Error: DJANGO_SECRET_KEY is missing!}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Error:DJANGO_SECRET_KEY is missing!}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
-      DB_NAME: ${DB_NAME:?Error: DB_NAME is missing!}
-      DB_USER: ${DB_USER:?Error: DB_USER is missing!}
-      DB_PASSWORD: ${DB_PASSWORD:?Error: DB_PASSWORD is missing!}
+      DB_NAME: ${DB_NAME:?Error:DB_NAME is missing!}
+      DB_USER: ${DB_USER:?Error:DB_USER is missing!}
+      DB_PASSWORD: ${DB_PASSWORD:?Error:DB_PASSWORD is missing!}
       DB_HOST: db
       DB_PORT: ${DB_PORT:-5432}
     ports:
@@ -46,13 +46,13 @@ services:
     container_name: bhns-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:?Error: DB_NAME is missing!}
-      POSTGRES_USER: ${DB_USER:?Error: DB_USER is missing!}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Error: DB_PASSWORD is missing!}
+      POSTGRES_DB: ${DB_NAME:?Error:DB_NAME is missing!}
+      POSTGRES_USER: ${DB_USER:?Error:DB_USER is missing!}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Error:DB_PASSWORD is missing!}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:?Error: DB_USER is missing!} -d ${DB_NAME:?Error: DB_NAME is missing!}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:?Error:DB_USER is missing!} -d ${DB_NAME:?Error:DB_NAME is missing!}"]
       interval: 5s
       timeout: 5s
       retries: 10

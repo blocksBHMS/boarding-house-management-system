@@ -13,10 +13,6 @@ permissions:
   contents: read
 
 jobs:
-  # ------------------------------------------------------------------
-  # Job 1: Build both Dockerfiles with docker compose and push the two
-  # images (bhns-client, bhns-server) to Docker Hub.
-  # ------------------------------------------------------------------
   build-and-push:
     name: Build & push images to Docker Hub
     runs-on: ubuntu-latest
@@ -33,6 +29,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Create .env from secret
+        run: printf '%s\n' "$PROD_ENV_FILE" > .env
+        env:
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+
       - name: Build both images with docker compose
         run: docker compose build
         env:
@@ -45,10 +46,6 @@ jobs:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG: ${{ github.sha }}
 
-  # ------------------------------------------------------------------
-  # Job 2: SSH into the server, copy the compose file over, pull the
-  # two images from Docker Hub, and run the containers.
-  # ------------------------------------------------------------------
   deploy:
     name: Deploy on server
     needs: build-and-push
@@ -57,14 +54,19 @@ jobs:
       - name: Checkout latest code
         uses: actions/checkout@v4
 
-      - name: Copy docker-compose.yml to server
+      - name: Create .env from secret
+        run: printf '%s\n' "$PROD_ENV_FILE" > .env
+        env:
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+
+      - name: Copy docker-compose.yml and .env to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: docker-compose.yml
+          source: "docker-compose.yml,.env"
           target: ~/bhms
 
       - name: Pull images & run containers on server
@@ -76,11 +78,11 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ~/bhms || exit 1
+            chmod 600 .env
 
             export DOCKERHUB_USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
             export IMAGE_TAG="${{ github.sha }}"
 
-            # Support both docker compose v2 and legacy docker-compose v1
             if docker compose version >/dev/null 2>&1; then
               DC="docker compose"
             else
