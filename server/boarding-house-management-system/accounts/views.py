@@ -1,3 +1,4 @@
+from accounts.permissions import isLandlord
 from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.permissions import AllowAny
