@@ -14,7 +14,7 @@ from accounts.permissions import isLandlord
 def _beds_with_occupied():
     return Bed.objects.annotate(
         is_occupied=Exists(
-            Tenancy.objects.filter(bed_id=OuterRef('pk'))
+            Tenancy.objects.filter(bed_id=OuterRef('pk'), is_active=True)
         )
     )
 

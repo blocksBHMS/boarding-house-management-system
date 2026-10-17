@@ -71,7 +71,7 @@ const createTenancy = async () => {
 }
 
 const deleteTenancy = async (id: number) => {
-  if (!confirm('End this tenancy? This cannot be undone.')) return
+  if (!confirm('End this tenancy? It will remain in the tenancy history.')) return
   try {
     await tenancyService.delete(id)
     await loadHouse(['tenancies', 'beds'])
@@ -114,7 +114,7 @@ onMounted(() => loadHouse(['tenancies', 'accounts', 'beds']))
     <!-- Table -->
     <div class="border-2 border-black bg-white shadow-[4px_4px_0_0_#000] mt-6">
       <div class="p-4 border-b-2 border-black bg-[#F4F4F0]">
-        <h3 class="text-lg font-black uppercase tracking-wider">Active Tenancies</h3>
+        <h3 class="text-lg font-black uppercase tracking-wider">Tenancy History</h3>
       </div>
 
       <div v-if="house.tenancies.length === 0" class="p-8 text-center font-mono text-sm text-gray-500">
@@ -129,6 +129,7 @@ onMounted(() => loadHouse(['tenancies', 'accounts', 'beds']))
               <th class="py-2 pr-4 font-bold uppercase">Bed</th>
               <th class="py-2 pr-4 font-bold uppercase">Check-in</th>
               <th class="py-2 pr-4 font-bold uppercase">Rate / mo</th>
+              <th class="py-2 pr-4 font-bold uppercase">Status</th>
               <th class="py-2 font-bold uppercase">Actions</th>
             </tr>
           </thead>
@@ -142,8 +143,9 @@ onMounted(() => loadHouse(['tenancies', 'accounts', 'beds']))
               <td class="py-3 pr-4">{{ bedFullLabel(t.bed) }}</td>
               <td class="py-3 pr-4">{{ t.check_in_date }}</td>
               <td class="py-3 pr-4">₱{{ Number(t.agreed_rate).toLocaleString('en-PH') }}</td>
+              <td class="py-3 pr-4">{{ t.is_active ? 'Active' : 'Ended' }}</td>
               <td class="py-3 font-bold">
-                <button
+                <button v-if="t.is_active"
                   @click="deleteTenancy(t.id)"
                   class="hover:bg-red-700 hover:text-white px-1 transition-colors"
                 >[ END ]</button>

@@ -9,7 +9,7 @@ const totalRooms   = computed(() => house.rooms.length)
 const totalBeds    = computed(() => house.beds.length)
 const occupiedBeds = computed(() => house.beds.filter(b => b.is_occupied).length)
 const vacantBeds   = computed(() => totalBeds.value - occupiedBeds.value)
-const activeTenants = computed(() => house.tenancies.length)
+const activeTenants = computed(() => house.tenancies.filter(t => t.is_active).length)
 
 // Unpaid this month = sum of (total charges - paid) for all invoices with a balance
 const currentMonth = new Date().toISOString().slice(0, 7) // "YYYY-MM"

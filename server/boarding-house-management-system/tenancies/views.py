@@ -1,35 +1,43 @@
-from django.db.models import ProtectedError
+from django.contrib.auth import get_user_model
+from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from beds.models import Bed
 from .models import Tenancy
 from tenancies.serializers import TenancySerializer
 from accounts.permissions import isLandlord
 
 # Create your views here.
 
-
-def _bed_is_occupied(bed_id):
-    return Tenancy.objects.filter(bed_id=bed_id).exists()
-
-
 # can be accessed by landlord only
 class TenancyCreate(APIView):
     permission_classes = [isLandlord]
 
     def post(self, request):
-        bed_id = request.data.get('bed')
-        if bed_id and _bed_is_occupied(bed_id):
-            return Response(
-                {'detail': 'This bed is already occupied.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         serializer = TenancySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        tenant = serializer.validated_data['tenant']
+        bed = serializer.validated_data['bed']
+        with transaction.atomic():
+            get_user_model().objects.select_for_update().get(pk=tenant.pk)
+            bed = Bed.objects.select_for_update().get(pk=bed.pk)
+            if Tenancy.objects.filter(bed=bed, is_active=True).exists():
+                return Response(
+                    {'detail': 'This bed is already occupied.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            Tenancy.objects.filter(tenant=tenant, is_active=True).update(is_active=False)
+            tenancy = serializer.save(room=bed.room_id, is_active=True)
+
+        return Response(
+            TenancySerializer(tenancy).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 # can be accessed by any authenticated user
@@ -55,11 +63,10 @@ class TenancyDelete(APIView):
                 {'detail': 'Tenancy not found.'},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        try:
-            tenancy.delete()
-        except ProtectedError:
+        updated = Tenancy.objects.filter(pk=pk, is_active=True).update(is_active=False)
+        if not updated:
             return Response(
-                {'detail': 'Cannot delete this tenancy because it has related invoices.'},
+                {'detail': 'This tenancy has already ended.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
