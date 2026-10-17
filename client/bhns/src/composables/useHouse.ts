@@ -87,15 +87,12 @@ const totalBeds = computed(() => rooms.value.reduce((n, r) => n + r.beds.length,
 const occupiedBeds = computed(() => rooms.value.reduce((n, r) => n + r.beds.filter((b) => b.isOccupied).length, 0))
 const vacantBeds = computed(() => totalBeds.value - occupiedBeds.value)
 
-const addRoom = (bedCount = 0) =>
+const addRoom = () =>
   run(async () => {
     const used = new Set(house.rooms.map((r) => r.room_number))
     let n = 101
     while (used.has(String(n))) n++
     const { data } = await roomService.create({ room_number: String(n) })
-    for (let i = 0; i < Math.min(bedCount, 2); i++) {
-      await bedService.create({ room_id: data.id, bed_label: `${letter(i)} (Single)` })
-    }
     await loadHouse(['rooms', 'beds'], true)
     return data
   })

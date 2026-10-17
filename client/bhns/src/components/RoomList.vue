@@ -27,7 +27,7 @@ const modal = ref({
   rateValue: '1500'
 })
 
-const openAddRoomModal = () => { modal.value = { isOpen: true, type: 'ADD_ROOM', roomId: null, bedDbId: null, inputValue: '2', selectedAccount: '', rateValue: '1500' } }
+const openAddRoomModal = () => { modal.value = { isOpen: true, type: 'ADD_ROOM', roomId: null, bedDbId: null, inputValue: '', selectedAccount: '', rateValue: '1500' } }
 const openEditRoomModal = (room: any) => { modal.value = { isOpen: true, type: 'EDIT_ROOM', roomId: room.id, bedDbId: null, inputValue: room.name.replace('Room ', ''), selectedAccount: '', rateValue: '1500' } }
 const openDeleteRoomModal = (roomId: number) => { modal.value = { isOpen: true, type: 'DELETE_ROOM', roomId, bedDbId: null, inputValue: '', selectedAccount: '', rateValue: '1500' } }
 const openAssignModal = (bedDbId: number) => { modal.value = { isOpen: true, type: 'ASSIGN_TENANT', roomId: null, bedDbId, inputValue: '', selectedAccount: '', rateValue: '1500' } }
@@ -35,12 +35,7 @@ const closeModal = () => { modal.value.isOpen = false }
 
 const submitModal = async () => {
   if (modal.value.type === 'ADD_ROOM') {
-    const beds = Number(modal.value.inputValue)
-    if (!Number.isInteger(beds) || beds < 0 || beds > 2) {
-      neoAlert('Invalid physical bed count (0-2 max).')
-      return
-    }
-    await addRoom(beds)
+    await addRoom()
   } 
   else if (modal.value.type === 'EDIT_ROOM' && modal.value.roomId) {
     const name = modal.value.inputValue.trim()
@@ -144,11 +139,14 @@ onMounted(() => loadHouse(['accounts']))
           </div>
           
           <div class="p-6 space-y-4 font-mono text-sm">
-            <div v-if="modal.type === 'ADD_ROOM' || modal.type === 'EDIT_ROOM'">
+            <div v-if="modal.type === 'ADD_ROOM'" class="font-bold">
+              A new room will be created without beds. Add beds separately from Beds Management.
+            </div>
+            <div v-else-if="modal.type === 'EDIT_ROOM'">
               <label class="block font-bold uppercase mb-1">
-                {{ modal.type === 'ADD_ROOM' ? 'How many physical beds (0-2)?' : 'New Room Number/Name' }}
+                New Room Number/Name
               </label>
-              <input v-model="modal.inputValue" :type="modal.type === 'ADD_ROOM' ? 'number' : 'text'" class="w-full border-2 border-black px-3 py-3 bg-[#F4F4F0] focus:outline-none focus:bg-white shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)] font-bold" @keyup.enter="submitModal" />
+              <input v-model="modal.inputValue" type="text" class="w-full border-2 border-black px-3 py-3 bg-[#F4F4F0] focus:outline-none focus:bg-white shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)] font-bold" @keyup.enter="submitModal" />
             </div>
 
             <div v-if="modal.type === 'ASSIGN_TENANT'" class="space-y-4">

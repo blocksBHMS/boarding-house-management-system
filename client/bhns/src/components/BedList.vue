@@ -11,6 +11,7 @@ const isTenant = currentUser().role === 'tenant'
 const { rooms, addBed, renameBed, deleteBed, assignTenant } = useHouse()
 
 const beds = computed(() => rooms.value.flatMap((room) => room.beds.map((bed) => ({ bed, room }))))
+const roomsWithCapacity = computed(() => rooms.value.filter((room) => room.physicalBedsCount < 2))
 
 const show3DView = ref(localStorage.getItem('bhns_show_3d') !== 'false')
 const toggle3DView = () => {
@@ -31,11 +32,12 @@ const modal = ref({
 })
 
 const openAddBedModal = () => {
-  const availableRoom = rooms.value.find(r => r.physicalBedsCount < 2)
+  const availableRoom = roomsWithCapacity.value[0]
+  if (!availableRoom) return
   modal.value = { 
     isOpen: true, 
     type: 'ADD_BED', 
-    roomId: availableRoom ? availableRoom.id : (rooms.value[0]?.id || null), 
+    roomId: availableRoom.id,
     bedId: null, inputValue: '', tenantInfo: '', selectedAccount: '', rateValue: '1500', bedType: 'single'
   }
 }
@@ -113,7 +115,7 @@ onMounted(() => loadHouse(['accounts']))
         <button @click="toggle3DView" class="border-2 border-black bg-white text-black px-4 py-2 font-mono text-sm font-bold uppercase hover:bg-black hover:text-white transition-colors shadow-[4px_4px_0_0_#000]">
           {{ show3DView ? 'Hide Top View' : 'Show Top View' }}
         </button>
-        <button v-if="!isTenant" @click="openAddBedModal" class="border-2 border-black bg-black text-white px-4 py-2 font-mono text-sm font-bold uppercase hover:bg-teal-700 transition-colors shadow-[4px_4px_0_0_#000]">
+        <button v-if="!isTenant" @click="openAddBedModal" :disabled="roomsWithCapacity.length === 0" class="border-2 border-black bg-black text-white px-4 py-2 font-mono text-sm font-bold uppercase hover:bg-teal-700 transition-colors shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50">
           + Add New Bed
         </button>
       </div>
