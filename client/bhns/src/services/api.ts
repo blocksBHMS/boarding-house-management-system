@@ -25,7 +25,7 @@ api.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
     if (axios.isAxiosError(error)) {
-      const isAuthCall = /^\/?(login|register)\//.test(error.config?.url ?? '')
+      const isAuthCall = /^\/?login\//.test(error.config?.url ?? '')
       if (error.response?.status === 401 && !isAuthCall) unauthorizedHandler?.()
     }
     return Promise.reject(error)
@@ -33,8 +33,7 @@ api.interceptors.response.use(
 )
 
 export const authService = {
-  login: (data: { username: string; password: string }) => api.post<LoginResponse>('/login/', data),
-  register: (data: Record<string, string>) => api.post('/register/', data),
+  login: (data: { username: string; password: string }) => api.post<LoginResponse>('/login/', data)
 }
 
 export const roomService = {

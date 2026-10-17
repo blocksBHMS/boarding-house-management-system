@@ -17,7 +17,6 @@ bhns_web/client/bhns/
 │   │   ├── Login.vue                     # Auth login page
 │   │   ├── Overview.vue                  # Main dashboard with KPIs and top-down 3D view
 │   │   ├── PaymentList.vue               # Payments management table
-│   │   ├── Register.vue                  # Auth registration page
 │   │   ├── RoomList.vue                  # Room management list
 │   │   └── TenancyList.vue               # Tenancies management table
 │   ├── composables/
