@@ -32,6 +32,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?Error:DB_PASSWORD is missing!}
       DB_HOST: db
       DB_PORT: ${DB_PORT:-5432}
+      LANDLORD_PASSCODE: ${LANDLORD_PASSCODE:?LANDLORD_PASSCODE is missing!}
     ports:
       - "8000:8080"
     depends_on:
