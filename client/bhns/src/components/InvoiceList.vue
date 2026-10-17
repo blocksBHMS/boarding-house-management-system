@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { house, loadHouse, tenancyLabel, invNo, invoiceTotals } from '../store/house'
 import { invoiceService } from '../services/api'
 import { currentUser } from '../services/session'
+import { apiError } from '../utils/errors'
 
 // --- ROLE BASED ACCESS ---
 const isTenant = currentUser().role === 'tenant'
@@ -49,12 +50,12 @@ const createInvoice = async () => {
     error.value = ''
     await invoiceService.create({
       tenancy_id: Number(form.value.tenancy_id),
-      billing_month: form.value.billing_month,
+      billing_month: `${form.value.billing_month}-01`,
     })
     await loadHouse(['invoices'])
     showModal.value = false
-  } catch (e: any) {
-    error.value = e?.response?.data?.detail ?? 'Failed to create invoice.'
+  } catch (e: unknown) {
+    error.value = apiError(e, 'Failed to create invoice.')
   } finally {
     isSubmitting.value = false
   }
@@ -116,7 +117,7 @@ onMounted(() => loadHouse(['items', 'invoices', 'tenancies', 'accounts', 'paymen
             >
               <td class="py-3 pr-4 font-bold">{{ invNo(inv.id) }}</td>
               <td class="py-3 pr-4">{{ tenancyLabel(inv.tenancy_id) }}</td>
-              <td class="py-3 pr-4">{{ inv.billing_month }}</td>
+              <td class="py-3 pr-4">{{ inv.billing_month.slice(0, 7) }}</td>
               <td class="py-3 pr-4 text-right">₱{{ invoiceTotals(inv.id).total.toLocaleString('en-PH') }}</td>
               <td class="py-3 pr-4 text-right text-red-700 font-bold">₱{{ invoiceTotals(inv.id).balance.toLocaleString('en-PH') }}</td>
               <td class="py-3 text-center">

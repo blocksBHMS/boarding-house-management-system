@@ -130,12 +130,12 @@ onMounted(() => loadHouse(['accounts']))
       <div
         v-for="{ bed, room } in beds" :key="bed.id"
         class="border-2 border-black p-4 shadow-[4px_4px_0_0_#000] flex flex-col h-full"
-        :class="bed.tenant ? 'bg-white' : 'bg-white border-dashed'"
+        :class="bed.isOccupied ? 'bg-white' : 'bg-white border-dashed'"
       >
-        <div class="flex justify-between items-center border-b-2 pb-2 mb-3" :class="bed.tenant ? 'border-black' : 'border-dashed border-gray-400'">
+        <div class="flex justify-between items-center border-b-2 pb-2 mb-3" :class="bed.isOccupied ? 'border-black' : 'border-dashed border-gray-400'">
           <h3 class="font-bold text-base uppercase">{{ bed.label }}</h3>
-          <div class="font-mono text-[10px] px-2 py-1 uppercase border border-black" :class="bed.tenant ? 'bg-gray-800 text-white' : 'bg-white text-black'">
-            [ {{ bed.tenant ? 'OCCUPIED' : 'VACANT' }} ]
+          <div class="font-mono text-[10px] px-2 py-1 uppercase border border-black" :class="bed.isOccupied ? 'bg-gray-800 text-white' : 'bg-white text-black'">
+            [ {{ bed.isOccupied ? 'OCCUPIED' : 'VACANT' }} ]
           </div>
         </div>
 
@@ -143,16 +143,16 @@ onMounted(() => loadHouse(['accounts']))
           <p>Rate: <span class="font-bold">₱{{ bed.rate.toLocaleString() }} / mo</span></p>
           <div class="pt-2">
             <p>🛏 ROOM: {{ room.name }} (Floor {{ room.floor }})</p>
-            <p v-if="bed.tenant" class="mt-2 text-teal-800 font-bold">👤 OCCUPANT: {{ bed.tenant }}</p>
+            <p v-if="bed.isOccupied" class="mt-2 text-teal-800 font-bold">👤 OCCUPANT: {{ bed.tenant ?? '[ OCCUPIED ]' }}</p>
             <p v-else class="mt-2 text-gray-400">👤 OCCUPANT: -- [ NO TENANT ]</p>
           </div>
         </div>
 
-        <div v-if="!isTenant" class="flex flex-col gap-2 mt-auto pt-4 border-t" :class="bed.tenant ? 'border-black' : 'border-dashed border-gray-400'">
+        <div v-if="!isTenant" class="flex flex-col gap-2 mt-auto pt-4 border-t" :class="bed.isOccupied ? 'border-black' : 'border-dashed border-gray-400'">
           <div class="flex gap-2">
             <button class="flex-1 border-2 border-black bg-[#F4F4F0] py-1 font-mono text-xs font-bold hover:bg-black hover:text-white transition-colors" @click="openEditBedModal(room.id, bed)">[ EDIT ]</button>
             <button v-if="bed.tenant" class="flex-1 border-2 border-black bg-[#F4F4F0] py-1 font-mono text-xs font-bold hover:bg-black hover:text-white transition-colors" @click="openViewTenantModal(bed)">[ VIEW TENANT ]</button>
-            <button v-else @click="openAssignModal(bed.dbId)" class="flex-1 border-2 border-black bg-black text-white py-1 font-mono text-xs font-bold hover:bg-teal-700 transition-colors">[ ASSIGN ]</button>
+            <button v-else-if="!bed.isOccupied" @click="openAssignModal(bed.dbId)" class="flex-1 border-2 border-black bg-black text-white py-1 font-mono text-xs font-bold hover:bg-teal-700 transition-colors">[ ASSIGN ]</button>
           </div>
           <button @click="openDeleteBedModal(bed)" class="w-full border-2 border-red-700 text-red-700 bg-white py-1 font-mono text-xs font-bold hover:bg-red-700 hover:text-white transition-colors">
             [ DELETE BED ]

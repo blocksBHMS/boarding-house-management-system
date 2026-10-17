@@ -9,7 +9,7 @@ import { neoAlert } from '../composables/useAlert'
 const isTenant = currentUser().role === 'tenant'
 const { rooms, totalRooms, totalBeds, occupiedBeds, vacantBeds, addRoom, addBed, renameRoom, deleteRoom, assignTenant } = useHouse()
 
-const occ = (r: { beds: { tenant: string | null }[] }) => r.beds.filter((b) => b.tenant).length
+const occ = (r: { beds: { isOccupied: boolean }[] }) => r.beds.filter((b) => b.isOccupied).length
 
 const show3DView = ref(localStorage.getItem('bhns_show_3d') !== 'false')
 const toggle3DView = () => {
@@ -110,12 +110,12 @@ onMounted(() => loadHouse(['accounts']))
         </div>
 
         <div class="flex-grow space-y-3 font-mono text-xs mb-6">
-          <div v-for="bed in room.beds" :key="bed.id" class="flex justify-between items-center" :class="bed.tenant ? '' : 'text-gray-500'">
+          <div v-for="bed in room.beds" :key="bed.id" class="flex justify-between items-center" :class="bed.isOccupied ? '' : 'text-gray-500'">
             <span class="flex items-center gap-2">
-              <span :class="bed.tenant ? 'text-teal-700' : ''">🛏</span>
-              {{ bed.label.toUpperCase() }}: {{ bed.tenant ?? '[ VACANT ]' }}
+              <span :class="bed.isOccupied ? 'text-teal-700' : ''">🛏</span>
+              {{ bed.label.toUpperCase() }}: {{ bed.tenant ?? (bed.isOccupied ? '[ OCCUPIED ]' : '[ VACANT ]') }}
             </span>
-            <span v-if="bed.tenant" class="bg-gray-200 border border-black px-1">[OCCUPIED]</span>
+            <span v-if="bed.isOccupied" class="bg-gray-200 border border-black px-1">[OCCUPIED]</span>
             <button v-else-if="!isTenant" @click="openAssignModal(bed.dbId)" class="hover:text-black hover:underline cursor-pointer">(+ Assign)</button>
           </div>
         </div>

@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { house, tenancyOfBed } from '../store/house'
+import { house } from '../store/house'
 
 const props = withDefaults(defineProps<{ mode?: 'top' | 'orbit' }>(), {
   mode: 'orbit',
@@ -76,7 +76,7 @@ const makeLabel = (text: string) => {
 }
 
 const makeBedSlot = (bed: any, roomId: number) => {
-  const isOcc = !!tenancyOfBed(bed.id)
+  const isOcc = bed.is_occupied
   const tone = isOcc ? 0x1f7a7d : 0xc8c8c8
   const g = new THREE.Group()
   
@@ -297,14 +297,14 @@ const describe = (g: THREE.Group): string[] => {
     const bed  = house.beds.find(b => b.id === bedId)
     const room = house.rooms.find(r => r.id === roomId)
     if (!bed || !room) return []
-    const isOcc = !!tenancyOfBed(bedId)
+    const isOcc = bed.is_occupied
     return [
       `${room.room_number} — ${bed.bed_label}`,
       isOcc ? 'Occupied' : 'Vacant',
     ]
   }
   const roomBeds = bedsForRoom(roomId)
-  const occ      = roomBeds.filter(b => !!tenancyOfBed(b.id)).length
+  const occ      = roomBeds.filter(b => b.is_occupied).length
   return [
     roomNumber ?? `Room ${roomId}`,
     `${occ} of ${roomBeds.length} slots occupied`,
