@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import hmac
 
 from django.conf import settings
@@ -10,6 +11,17 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.permissions import isLandlord
 
 from accounts.models import Accounts
+=======
+from django.contrib.auth import authenticate
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from accounts.models import Accounts
+from accounts.permissions import isLandlord
+>>>>>>> 2b8615d (feat(server): remove register on homepage backend)
 from accounts.serializers import AccountSerializer
 
 
@@ -50,6 +62,7 @@ class AccountLogin(APIView):
         )
 
 
+<<<<<<< HEAD
 class AccountRegister(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []  # a stale token can't cause 401s on signup
@@ -85,6 +98,8 @@ class AccountRegister(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+=======
+>>>>>>> 2b8615d (feat(server): remove register on homepage backend)
 class AccountListCreate(APIView):
     permission_classes = [isLandlord]
 
@@ -98,10 +113,16 @@ class AccountListCreate(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+<<<<<<< HEAD
         return Response(
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+=======
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+>>>>>>> 2b8615d (feat(server): remove register on homepage backend)
 class AccountDelete(APIView):
     permission_classes = [isLandlord]
 
@@ -112,6 +133,7 @@ class AccountDelete(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Accounts.DoesNotExist:
             return Response(
+<<<<<<< HEAD
                 data={'detail': 'Account not found.'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
@@ -164,3 +186,13 @@ class AccountLogin(APIView):
             },
             status=status.HTTP_200_OK
         )
+=======
+                data={'detail': 'Account not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception:
+            return Response(
+                data={'detail': 'Cannot delete this account. It is currently assigned to a bed or invoice.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+>>>>>>> 2b8615d (feat(server): remove register on homepage backend)

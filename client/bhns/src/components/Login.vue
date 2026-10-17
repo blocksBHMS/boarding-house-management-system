@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { authService } from '../services/api'
 import { saveSession } from '../services/session'
 
 const router = useRouter()
-const route = useRoute()
 const username = ref('')
 const password = ref('')
 const error = ref('')
@@ -35,7 +34,6 @@ async function handleLogin() {
       <h1 class="brut-title text-5xl">BHMS.</h1>
       <p class="mb-6 mt-1 text-muted">Sign in to manage your boarding house.</p>
 
-      <p v-if="route.query.registered" class="brut-flat mb-4 bg-leaf p-3 text-white" role="status">Account created. You can sign in now.</p>
       <p v-if="error" class="brut-flat mb-4 bg-rust p-3 text-white" role="alert">{{ error }}</p>
 
       <form class="space-y-4" @submit.prevent="handleLogin">
@@ -52,9 +50,8 @@ async function handleLogin() {
         </button>
       </form>
 
-      <p class="mt-5 text-center text-sm">
-        No account yet?
-        <RouterLink to="/register" class="font-semibold text-teal-dark underline">Create one</RouterLink>
+      <p class="mt-5 text-center text-sm text-muted">
+        Don't have an account? Ask your landlord to create one for you.
       </p>
     </div>
   </div>
