@@ -69,7 +69,7 @@ export function accountName(id: number | undefined): string {
 
 export function tenancyOfBed(bedId: number): Tenancy | undefined {
   return house.tenancies
-    .filter((t) => t.bed === bedId)
+    .filter((t) => t.bed === bedId && t.is_active)
     .sort((a, b) => b.check_in_date.localeCompare(a.check_in_date) || b.id - a.id)[0]
 }
 

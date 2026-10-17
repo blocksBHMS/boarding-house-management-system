@@ -15,7 +15,8 @@ export interface Tenancy {
   bed: number; 
   room?: number; 
   check_in_date: string; 
-  agreed_rate: string 
+  agreed_rate: string;
+  is_active: boolean
 }
 export interface Account { 
   id: number; 

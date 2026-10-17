@@ -6,7 +6,8 @@ from .models import Tenancy
 class TenancySerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenancy
-        fields = ['id', 'tenant', 'bed', 'room', 'check_in_date', 'agreed_rate']
+        fields = ['id', 'tenant', 'bed', 'room', 'check_in_date', 'agreed_rate', 'is_active']
+        read_only_fields = ['is_active']
         extra_kwargs = {
             'room': {'required': False},
         }
