@@ -8,6 +8,7 @@ export interface Bed {
   id: string
   dbId: number
   label: string
+  isOccupied: boolean
   rate: number
   tenant: string | null
 }
@@ -63,6 +64,7 @@ const rooms = computed<Room[]>(() =>
           id: `${r.room_number}-${b.bed_label}`,
           dbId: b.id,
           label: `Bed ${b.bed_label}`,
+          isOccupied: b.is_occupied,
           rate: t ? Number(t.agreed_rate) || 0 : 0,
           tenant: t ? accountName(t.tenant) : null,
         }
@@ -82,7 +84,7 @@ const rooms = computed<Room[]>(() =>
 const floors = computed(() => [...new Set(rooms.value.map((r) => r.floor))].sort((a, b) => a - b))
 const totalRooms = computed(() => rooms.value.length)
 const totalBeds = computed(() => rooms.value.reduce((n, r) => n + r.beds.length, 0))
-const occupiedBeds = computed(() => rooms.value.reduce((n, r) => n + r.beds.filter((b) => b.tenant).length, 0))
+const occupiedBeds = computed(() => rooms.value.reduce((n, r) => n + r.beds.filter((b) => b.isOccupied).length, 0))
 const vacantBeds = computed(() => totalBeds.value - occupiedBeds.value)
 
 const addRoom = (bedCount = 0) =>
