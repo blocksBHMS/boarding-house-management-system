@@ -12,6 +12,7 @@ const { rooms, addBed, renameBed, deleteBed, assignTenant } = useHouse()
 
 const beds = computed(() => rooms.value.flatMap((room) => room.beds.map((bed) => ({ bed, room }))))
 const roomsWithCapacity = computed(() => rooms.value.filter((room) => room.physicalBedsCount < 2))
+const tenantAccounts = computed(() => house.accounts.filter((account) => account.role === 'tenant'))
 
 const show3DView = ref(localStorage.getItem('bhns_show_3d') !== 'false')
 const toggle3DView = () => {
@@ -206,7 +207,7 @@ onMounted(() => loadHouse(['accounts']))
                 <label class="block font-bold uppercase mb-1">Select Tenant</label>
                 <select v-model="modal.selectedAccount" class="w-full border-2 border-black px-3 py-3 bg-[#F4F4F0] focus:outline-none focus:bg-white font-bold shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)]">
                   <option value="" disabled>Choose account...</option>
-                  <option v-for="acc in house.accounts" :key="acc.id" :value="acc.id">
+                  <option v-for="acc in tenantAccounts" :key="acc.id" :value="acc.id">
                     {{ acc.first_name }} {{ acc.last_name }} ({{ acc.username }})
                   </option>
                 </select>
