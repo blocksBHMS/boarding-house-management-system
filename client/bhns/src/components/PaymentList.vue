@@ -11,6 +11,8 @@ const showModal = ref(false)
 const isSubmitting = ref(false)
 const error = ref('')
 const actionError = ref('')
+const approvePaymentId = ref<number | null>(null)
+const isApproving = ref(false)
 const reviewPaymentId = ref<number | null>(null)
 const rejectionReason = ref('')
 const isReviewing = ref(false)
@@ -66,13 +68,24 @@ const createPayment = async () => {
   }
 }
 
-async function approvePayment(paymentId: number) {
+function openApproveModal(paymentId: number) {
+  actionError.value = ''
+  approvePaymentId.value = paymentId
+}
+
+async function approvePayment() {
+  if (approvePaymentId.value === null) return
+
+  isApproving.value = true
   actionError.value = ''
   try {
-    await paymentService.review(paymentId, { status: 'paid' })
+    await paymentService.review(approvePaymentId.value, { status: 'paid' })
     await loadHouse(['payments'])
+    approvePaymentId.value = null
   } catch (e: unknown) {
     actionError.value = apiError(e, 'Failed to approve payment.')
+  } finally {
+    isApproving.value = false
   }
 }
 
@@ -187,7 +200,7 @@ onMounted(() => loadHouse(
                   <button
                     type="button"
                     class="border-2 border-black bg-teal-700 px-2 py-1 text-[10px] font-bold uppercase text-white hover:bg-black"
-                    @click="approvePayment(pay.id)"
+                    @click="openApproveModal(pay.id)"
                   >Approve</button>
                   <button
                     type="button"
@@ -269,6 +282,52 @@ onMounted(() => loadHouse(
               >
                 {{ isSubmitting ? 'Saving...' : isTenant ? 'Submit Payment' : 'Record Payment' }}
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div
+        v-if="approvePaymentId !== null"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+        @click.self="!isApproving && (approvePaymentId = null)"
+      >
+        <div
+          class="w-full max-w-md border-4 border-black bg-white shadow-[8px_8px_0_0_#000]"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="approve-payment-title"
+        >
+          <div class="flex items-center justify-between border-b-4 border-black bg-[#EAE8DD] p-4">
+            <h2 id="approve-payment-title" class="text-sm font-black uppercase tracking-wider">Approve Payment</h2>
+            <button
+              type="button"
+              class="px-2 font-bold hover:bg-black hover:text-white disabled:opacity-50"
+              :disabled="isApproving"
+              aria-label="Close confirmation"
+              @click="approvePaymentId = null"
+            >✕</button>
+          </div>
+          <div class="space-y-4 p-6 font-mono text-sm">
+            <p>Are you sure you want to approve this payment? This will update the invoice balance.</p>
+            <div v-if="actionError" class="border-2 border-red-700 bg-red-100 px-3 py-2 text-xs font-bold text-red-800">
+              {{ actionError }}
+            </div>
+            <div class="flex gap-3">
+              <button
+                type="button"
+                class="flex-1 border-2 border-black bg-white py-3 font-bold uppercase hover:bg-[#EAE8DD] disabled:opacity-50"
+                :disabled="isApproving"
+                @click="approvePaymentId = null"
+              >Cancel</button>
+              <button
+                type="button"
+                class="flex-1 border-2 border-black bg-teal-700 py-3 font-bold uppercase text-white shadow-[4px_4px_0_0_#000] hover:bg-black disabled:opacity-50"
+                :disabled="isApproving"
+                @click="approvePayment"
+              >{{ isApproving ? 'Approving...' : 'Yes, Approve' }}</button>
             </div>
           </div>
         </div>
