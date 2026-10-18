@@ -42,7 +42,10 @@ export interface Payment {
   invoice: number; 
   payment_date: string; 
   amount_paid: string; 
-  method: string 
+  method: string;
+  status: 'pending' | 'paid' | 'rejected';
+  rejection_reason: string;
+  reviewed_at: string | null;
 }
 
 export interface LoginResponse {

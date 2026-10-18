@@ -75,6 +75,8 @@ export const invoiceItemService = {
 export const paymentService = {
   getAll: () => api.get<Payment[]>('/payments/'),
   create: (data: { invoice: number; payment_date: string; amount_paid: string; method: string }) => api.post<Payment>('/payments/create/', data),
+  review: (id: number, data: { status: 'paid' | 'rejected'; rejection_reason?: string }) =>
+    api.patch<Payment>(`/payments/${id}/review/`, data),
 }
 
 export default api

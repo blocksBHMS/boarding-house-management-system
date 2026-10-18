@@ -5,9 +5,7 @@ import { invoiceService } from '../services/api'
 import { currentUser } from '../services/session'
 import { apiError } from '../utils/errors'
 
-// --- ROLE BASED ACCESS ---
 const isTenant = currentUser().role === 'tenant'
-const sessionAccount = JSON.parse(localStorage.getItem('account') || '{}')
 
 const showModal = ref(false)
 const isSubmitting = ref(false)
@@ -18,18 +16,8 @@ const form = ref({
   billing_month: new Date().toISOString().slice(0, 7)
 })
 
-// --- FILTERED DATA ---
 const sortedInvoices = computed(() => {
-  let invs = house.invoices
-  
-  if (isTenant) {
-    const myAcc = house.accounts.find(a => a.username === sessionAccount.username)
-    if (!myAcc) return []
-    const myTenancies = house.tenancies.filter(t => t.tenant === myAcc.id).map(t => t.id)
-    invs = invs.filter(i => myTenancies.includes(i.tenancy_id))
-  }
-  
-  return [...invs].sort((a, b) => b.id - a.id)
+  return [...house.invoices].sort((a, b) => b.id - a.id)
 })
 
 // --- ACTIONS ---
@@ -61,7 +49,19 @@ const createInvoice = async () => {
   }
 }
 
-onMounted(() => loadHouse(['items', 'invoices', 'tenancies', 'accounts', 'payments']))
+onMounted(() => loadHouse(
+  isTenant 
+  ? ['items', 'invoices', 'payments'] 
+  : ['rooms', 'beds', 'items', 'invoices', 'tenancies', 'accounts', 'payments'],
+))
+
+// --- COMPUTED ---
+const activeTenancies = computed(() =>
+  house.tenancies.filter((tenancy) => tenancy.is_active)
+)
+// --- ENDED TENANCY CHECK ---
+const isEndedTenancy = (tenancyId: number) =>
+  house.tenancies.some((tenancy) => tenancy.id === tenancyId && !tenancy.is_active)
 </script>
 
 <template>
@@ -102,7 +102,7 @@ onMounted(() => loadHouse(['items', 'invoices', 'tenancies', 'accounts', 'paymen
           <thead>
             <tr class="border-b-2 border-black">
               <th class="py-2 pr-4 font-bold uppercase">Invoice #</th>
-              <th class="py-2 pr-4 font-bold uppercase">Tenant</th>
+              <th v-if="!isTenant" class="py-2 pr-4 font-bold uppercase">Tenant</th>
               <th class="py-2 pr-4 font-bold uppercase">Billing Month</th>
               <th class="py-2 pr-4 font-bold uppercase text-right">Total</th>
               <th class="py-2 pr-4 font-bold uppercase text-right">Balance</th>
@@ -116,7 +116,10 @@ onMounted(() => loadHouse(['items', 'invoices', 'tenancies', 'accounts', 'paymen
               class="border-b border-gray-300 hover:bg-[#F4F4F0] transition-colors"
             >
               <td class="py-3 pr-4 font-bold">{{ invNo(inv.id) }}</td>
-              <td class="py-3 pr-4">{{ tenancyLabel(inv.tenancy_id) }}</td>
+              <td v-if="!isTenant" class="py-3 pr-4">
+                {{ tenancyLabel(inv.tenancy_id) }}
+                <span v-if="isEndedTenancy(inv.tenancy_id)" class="ml-1 text-xs font-bold uppercase text-red-700">(Ended)</span>
+              </td>
               <td class="py-3 pr-4">{{ inv.billing_month.slice(0, 7) }}</td>
               <td class="py-3 pr-4 text-right">₱{{ invoiceTotals(inv.id).total.toLocaleString('en-PH') }}</td>
               <td class="py-3 pr-4 text-right text-red-700 font-bold">₱{{ invoiceTotals(inv.id).balance.toLocaleString('en-PH') }}</td>
@@ -156,7 +159,7 @@ onMounted(() => loadHouse(['items', 'invoices', 'tenancies', 'accounts', 'paymen
               <label class="block font-bold uppercase mb-1">Tenancy</label>
               <select v-model="form.tenancy_id" class="w-full border-2 border-black px-3 py-3 bg-[#F4F4F0] focus:outline-none focus:bg-white font-bold shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)]">
                 <option value="" disabled>Select tenant</option>
-                <option v-for="t in house.tenancies" :key="t.id" :value="t.id">
+                <option v-for="t in activeTenancies" :key="t.id" :value="t.id">
                   {{ tenancyLabel(t.id) }}
                 </option>
               </select>

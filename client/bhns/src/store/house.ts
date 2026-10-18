@@ -98,7 +98,9 @@ const cents = (n: number) => Math.round(n * 100) / 100
 export function invoiceTotals(invoiceId: number) {
   const lines = house.items.filter((i) => i.invoice_id === invoiceId)
   const total = cents(lines.reduce((s, i) => s + (Number(i.amount) || 0), 0))
-  const paid = cents(house.payments.filter((p) => p.invoice === invoiceId).reduce((s, p) => s + (Number(p.amount_paid) || 0), 0))
+  const paid = cents(house.payments
+    .filter((p) => p.invoice === invoiceId && p.status === 'paid')
+    .reduce((s, p) => s + (Number(p.amount_paid) || 0), 0))
   const balance = Math.max(cents(total - paid), 0)
   const status: 'none' | 'paid' | 'partial' | 'unpaid' =
     lines.length === 0 ? 'none' : paid >= total ? 'paid' : paid > 0 ? 'partial' : 'unpaid'
