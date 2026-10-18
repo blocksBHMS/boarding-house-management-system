@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { alertModalState, closeNeoAlert } from '../composables/useAlert'
 </script>
-
-// this nigga is a global modal for alerts
 <template>
   <Teleport to="body">
     <div v-if="alertModalState.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" @click.self="closeNeoAlert">
